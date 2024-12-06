@@ -131,9 +131,23 @@ INSERT INTO orders(user_id,food_id,amount,code,arr_sub_id) VALUES
 (8, 2, 2, '247','1'),
 
 -- Tìm 5 người đã like nhà hàng nhiều nhất
-SELECT like_res.user_id AS 'ID', COUNT(like_res.user_id) AS 'Count', users.full_name AS 'Name' FROM like_res
+SELECT like_res.user_id AS 'ID', users.full_name AS 'Name', COUNT(like_res.user_id) AS 'Like'  FROM like_res
 INNER JOIN users ON like_res.user_id = users.user_id
 GROUP BY like_res.user_id ORDER BY 'Count' DESC
 LIMIT 5
 -- Tìm 2 nhà hàng có lượt like nhiêu nhẩt
-SELECT * FROM like_use
+SELECT like_res.res_id AS 'ID', restaurant.res_name AS 'Name', COUNT(like_res.res_id) AS 'Like' FROM like_res
+INNER JOIN restaurant ON like_res.res_id = restaurant.res_id
+GROUP BY like_res.res_id ORDER BY 'Count' DESC
+LIMIT 2
+-- Tìm người đã đặt hàng nhiều nhất
+SELECT orders.user_id AS 'ID', users.full_name AS 'Name', COUNT(orders.user_id) AS 'Order' FROM orders
+INNER JOIN users ON orders.user_id = users.user_id
+GROUP BY orders.user_id ORDER BY 'Count' DESC
+LIMIT 1
+-- Tìm người dùng không hoạt động trong hệ thống ( không đặt hàng, không like, không đánh giá )
+SELECT users.user_id AS 'ID', users.full_name AS 'Adjective', users.email AS 'Email' FROM users
+LEFT JOIN orders ON users.user_id = orders.user_id
+LEFT JOIN like_res ON users.user_id = like_res.user_id
+LEFT JOIN rate_res ON users.user_id = rate_res.user_id
+WHERE orders.user_id IS NULL AND like_res.user_id IS NULL AND rate_res.user_id IS NULL
